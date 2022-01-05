@@ -1,0 +1,5 @@
+domain: e6803e4.kyma.shoot.live.k8s-hana.ondemand.com
+port: 8080
+image:
+  hub: tiaxu
+  tag: v1
