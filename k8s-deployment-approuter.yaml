@@ -4,9 +4,9 @@ kind: APIRule
 metadata:
   creationTimestamp: null
   labels:
-    app: kyma-multitenant-node-multitenancy
+    app: kyma-multitenant-approuter-multitenancy
     release: multitenancy
-  name: kyma-multitenant-node-multitenancy
+  name: kyma-multitenant-approuter-multitenancy
 spec:
   gateway: kyma-gateway.kyma-system.svc.cluster.local
   rules:
@@ -20,11 +20,16 @@ spec:
     - DELETE
     - HEAD
     path: /.*
+    # mutators:
+    # - handler: header
+    #   config:
+    #     headers:
+    #       x-forwarded-host: kyma-multitenant-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com # adapt to your Kyma cluster
   service:
-    host: kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com
-    name: kyma-multitenant-node-multitenancy
+    host: kyma-multitenant-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com
+    name: kyma-multitenant-approuter-multitenancy
     port: 8080
-status: {}
+
 
 ---
 apiVersion: apps/v1
@@ -32,21 +37,21 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: kyma-multitenant-node-multitenancy
+    app: kyma-multitenant-approuter-multitenancy
     release: multitenancy
-  name: kyma-multitenant-node-multitenancy
+  name: kyma-multitenant-approuter-multitenancy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kyma-multitenant-node-multitenancy
+      app: kyma-multitenant-approuter-multitenancy
       release: multitenancy
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: kyma-multitenant-node-multitenancy
+        app: kyma-multitenant-approuter-multitenancy
         release: multitenancy
     spec:
       automountServiceAccountToken: false
@@ -54,6 +59,18 @@ spec:
         - name: registry-secret # replace with your own registry secret
       containers:
       - env:
+        - name: destinations
+          valueFrom: 
+            configMapKeyRef:
+              name: destinations-config
+              key: destinations
+        - name: CLUSTER_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              key: cluster-domain
+              name: cluster-domain
+        # - name: TENANT_HOST_PATTERN
+        #   value: ^(.*)-kyma-multitenant-approuter.$(CLUSTER_DOMAIN)"   
         - name: PORT
           value: "8080"
         - name: TMPDIR
@@ -63,17 +80,17 @@ spec:
             {
               "process_id": 1,
               "instance_id": 1,
-              "application_name": "kyma-multitenant-node",
-              "application_id": "0cec7be4-b09d-48f6-81ce-dad736ae4581",
-              "application_version": "935bfe91-b6e2-43cc-99fd-89d0dd23c139",
+              "application_name": "kyma-multitenant-approuter",
+              "application_id": "04d84f97-a039-4462-87cc-a5c444663a8e",
+              "application_version": "488998d5-805d-428f-b5ae-458be0695357",
               "application_uris": [
-                "kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
+                "kyma-multitenant-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
               ],
               "uris": [
-                "kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
+                "kyma-multitenant-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
               ]
             }
-        image: tiaxu/multitenant-node:v1
+        image: tiaxu/multitenant-approuter:v1
         livenessProbe:
           exec:
             command:
@@ -86,7 +103,7 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 60
-        name: kyma-multitenant-node-multitenancy
+        name: kyma-multitenant-approuter-multitenancy
         ports:
         - containerPort: 8080
         readinessProbe:
@@ -117,9 +134,6 @@ spec:
           privileged: false
           readOnlyRootFilesystem: false
         volumeMounts:
-        - name: destination-volume
-          mountPath: "/etc/secrets/sapcp/destination/destination-service"
-          readOnly: true
         - name: xsuaa-volume
           mountPath: "/etc/secrets/sapcp/xsuaa/uaa-kyma-multitenant"
           readOnly: true
@@ -133,9 +147,6 @@ spec:
       - name: xsuaa-volume
         secret:
           secretName: uaa-kyma-multitenant-binding
-      - name: destination-volume
-        secret:
-          secretName: destination-service-binding
 status: {}
 
 ---
@@ -144,39 +155,45 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: kyma-multitenant-node-multitenancy
+    app: kyma-multitenant-approuter-multitenancy
     release: multitenancy
-  name: kyma-multitenant-node-multitenancy
+  name: kyma-multitenant-approuter-multitenancy
 spec:
+  type: ClusterIP
   ports:
   - port: 8080
     protocol: TCP
     targetPort: 8080
   selector:
-    app: kyma-multitenant-node-multitenancy
+    app: kyma-multitenant-approuter-multitenancy
     release: multitenancy
-status:
-  loadBalancer: {}
+
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  creationTimestamp: null
-  labels:
-    release: multitenancy
-  name: multitenancy
-spec:
-  ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: istio-system
-      podSelector:
-        matchLabels:
-          app: istio-ingressgateway
-  podSelector:
-    matchLabels:
-      release: multitenancy
-  policyTypes:
-  - Ingress
+  name: destinations-config
+data:
+# two alternatives: # adapt to your Kyma cluster
+#   1. use (external) service url provided by Kyma APIRule (JWT enabled) (see application "deployment.yaml" APIRule)
+  # destinations: |
+  #   [
+  #     {"name":"broker","url":"https://broker.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com","forwardAuthToken" : true}
+  #   ]
+#   2. use cluster internal service url:  note that internal service naming follows http://<service-name>.<namespace>.svc.cluster.local:<service-port>
+#  make sure "namespace" of the broker is adapted when deploying to different namespace
+  destinations: |
+    [
+      {"name":"dest_kyma_multitenant_node","url":"https://kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com","forwardAuthToken" : true}
+    ] 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-domain
+data:
+  cluster-domain: e6803e4.kyma.shoot.live.k8s-hana.ondemand.com  ## adapt to your Kyma cluster
+
+
+

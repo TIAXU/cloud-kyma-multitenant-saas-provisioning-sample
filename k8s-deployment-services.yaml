@@ -1,0 +1,59 @@
+
+---
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  annotations:
+    com.sap.cki/source-instance-name: uaa_kyma_multitenant
+  creationTimestamp: null
+  name: uaa-kyma-multitenant
+spec:
+  clusterServiceClassExternalName: xsuaa
+  clusterServicePlanExternalName: application
+  parameters:
+    xsappname: multitenant-hands-on-kyma
+    tenant-mode: dedicated
+    description: Security profile of called application
+    scopes:
+    - name: $XSAPPNAME.Callback
+      description: With this scope set, the callbacks for subscribe, unsubscribe and getDependencies can be called.
+      grant-as-authority-to-apps:
+      - $XSAPPNAME(application,sap-provisioning,tenant-onboarding)    
+    oauth2-configuration:
+      redirect-uris:
+      - https://*.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com/**
+
+---
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceBinding
+metadata:
+  creationTimestamp: null
+  name: uaa-kyma-multitenant-binding
+spec:
+  externalID: ""
+  instanceRef:
+    name: uaa-kyma-multitenant
+  secretName: uaa-kyma-multitenant-binding
+
+---
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: destination-service
+spec:
+  clusterServiceClassExternalName: destination
+  clusterServicePlanExternalName: lite
+---
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceBinding
+metadata:
+  name: destination-service-binding
+spec:
+  instanceRef:
+    name: destination-service
+
+
+
+
+
+

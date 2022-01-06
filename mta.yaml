@@ -4,15 +4,62 @@ description: A NodeJS application to show how to use the SaaS registry to build 
 version: 1.0.0
 
 modules:
- - name: kyma-multitenant-node-app
+ - name: kyma-multitenant-node
    type: nodejs
-   path: kyma-multitenant-node-app
+   path: kyma-multitenant-node
    parameters:
       disk-quota: 256M
       memory: 256M
-      host: kyma-multitenant-node-app
+      host: kyma-multitenant-node
+ - name: kyma-multitenant-approuter
+   type: nodejs
+   path: kyma-multitenant-approuter
+   parameters:
+      disk-quota: 256M
+      memory: 256M
+      host: kyma-multitenant-approuter
+      keep-existing: 
+        routes: true
+   provides:
+    - name: Router_api
+      properties:
+         url: ${default-url}
+         application: ${app-name}
+   requires:
+      - name: uaa_kyma_multitenant
+      - name: dest_kyma-multitenant-node
+        group: destinations
+        properties:
+          name: dest_kyma-multitenant-node
+          url: '~{node_app_url}'
+          forwardAuthToken: true
 
-
+resources:
+ - name: uaa_kyma_multitenant
+   type: org.cloudfoundry.managed-service
+   requires:
+    - name: Router_api
+   properties:
+      XSAPPNAME: ${xsuaa-app}
+   parameters:
+      #path: ./xs-security.json
+      service-plan: application
+      service: xsuaa
+      shared: true
+      xsuaa-app: ${space}-~{Router_api/application}
+      config:
+         xsappname: ${xsuaa-app}
+         ### tenant-mode
+         tenant-mode: shared
+         description: Security profile of called application
+         scopes:
+          - name: "$XSAPPNAME.Callback"
+            description: With this scope set, the callbacks for tenant onboarding, offboarding and getDependencies can be called.
+            grant-as-authority-to-apps: 
+             - "$XSAPPNAME(application,sap-provisioning,tenant-onboarding)"
+         oauth2-configuration:
+            redirect-uris: 
+             - "http*://*.${default-domain}/**"
 
 
 
