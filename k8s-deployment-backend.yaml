@@ -21,7 +21,7 @@ spec:
     - HEAD
     path: /.*
   service:
-    host: kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com
+    host: trial-kyma-vnrmtio8-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com
     name: kyma-multitenant-node-multitenancy
     port: 8080
 status: {}
@@ -49,7 +49,7 @@ spec:
         app: kyma-multitenant-node-multitenancy
         release: multitenancy
     spec:
-      automountServiceAccountToken: false
+      automountServiceAccountToken: true
       imagePullSecrets:
         - name: registry-secret # replace with your own registry secret
       containers:
@@ -73,7 +73,7 @@ spec:
                 "kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
               ]
             }
-        image: tiaxu/kyma-multitenant-node:v1
+        image: tiaxu/multitenancy-kyma-node-app:v1
         livenessProbe:
           exec:
             command:
