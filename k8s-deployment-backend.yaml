@@ -51,28 +51,13 @@ spec:
     spec:
       automountServiceAccountToken: true
       imagePullSecrets:
-        - name: registry-secret # replace with your own registry secret
+        - name: registry-secret 
       containers:
       - env:
         - name: PORT
           value: "8080"
         - name: TMPDIR
           value: /tmp
-        - name: VCAP_APPLICATION
-          value: |-
-            {
-              "process_id": 1,
-              "instance_id": 1,
-              "application_name": "kyma-multitenant-node",
-              "application_id": "0cec7be4-b09d-48f6-81ce-dad736ae4581",
-              "application_version": "935bfe91-b6e2-43cc-99fd-89d0dd23c139",
-              "application_uris": [
-                "trial-kyma-vnrmtio8-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
-              ],
-              "uris": [
-                "trial-kyma-vnrmtio8-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
-              ]
-            }
         image: tiaxu/multitenancy-kyma-node-app:v1
         livenessProbe:
           exec:
@@ -117,9 +102,6 @@ spec:
           privileged: false
           readOnlyRootFilesystem: false
         volumeMounts:
-        - name: destination-volume
-          mountPath: "/etc/secrets/sapcp/destination/destination-service"
-          readOnly: true
         - name: xsuaa-volume
           mountPath: "/etc/secrets/sapcp/xsuaa/xsuaa-service"
           readOnly: true
@@ -136,13 +118,9 @@ spec:
       - name: xsuaa-volume
         secret:
           secretName: xsuaa-service-binding
-      - name: destination-volume
-        secret:
-          secretName: destination-service-binding
       - name: saas-registry-volume
         secret:
           secretName: saas-registry-service-binding
-
 status: {}
 
 ---

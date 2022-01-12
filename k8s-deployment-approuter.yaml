@@ -20,11 +20,6 @@ spec:
     - DELETE
     - HEAD
     path: /.*
-    # mutators:
-    # - handler: header
-    #   config:
-    #     headers:
-    #       x-forwarded-host: trial-kyma-vnrmtio8-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com # adapt to your Kyma cluster
   service:  
     host: trial-kyma-vnrmtio8-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com
     name: kyma-multitenant-approuter-multitenancy
@@ -56,7 +51,7 @@ spec:
     spec:
       automountServiceAccountToken: false
       imagePullSecrets:
-        - name: registry-secret # replace with your own registry secret
+        - name: registry-secret 
       containers:
       - env:
         - name: destinations
@@ -75,21 +70,6 @@ spec:
           value: "8080"
         - name: TMPDIR
           value: /tmp
-        - name: VCAP_APPLICATION
-          value: |-
-            {
-              "process_id": 1,
-              "instance_id": 1,
-              "application_name": "kyma-multitenant-approuter",
-              "application_id": "04d84f97-a039-4462-87cc-a5c444663a8e",
-              "application_version": "488998d5-805d-428f-b5ae-458be0695357",
-              "application_uris": [
-                "kyma-multitenant-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
-              ],
-              "uris": [
-                "kyma-multitenant-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
-              ]
-            }
         image: tiaxu/multitenant-approuter:v1
         livenessProbe:
           exec:
@@ -177,16 +157,17 @@ metadata:
 data:
 # two alternatives: # adapt to your Kyma cluster
 #   1. use (external) service url provided by Kyma APIRule (JWT enabled) (see application "deployment.yaml" APIRule)
-  # destinations: |
-  #   [
-  #     {"name":"broker","url":"https://broker.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com","forwardAuthToken" : true}
-  #   ]
+#   destinations: |
+#     [
+#       {"name":"broker","url":"https://broker.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com","forwardAuthToken" : true}
+#     ]
 #   2. use cluster internal service url:  note that internal service naming follows http://<service-name>.<namespace>.svc.cluster.local:<service-port>
 #  make sure "namespace" of the broker is adapted when deploying to different namespace
   destinations: |
     [
       {"name":"dest_kyma_multitenant_node","url":"https://trial-kyma-vnrmtio8-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com","forwardAuthToken" : true}
     ] 
+
 ---
 apiVersion: v1
 kind: ConfigMap

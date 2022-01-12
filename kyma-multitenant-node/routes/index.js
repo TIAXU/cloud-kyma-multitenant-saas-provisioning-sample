@@ -133,5 +133,4 @@ router.delete('/callback/v1.0/tenants/*', async function(req, res) {
 });
 //************************************************************************************************
 
-
 module.exports = router;

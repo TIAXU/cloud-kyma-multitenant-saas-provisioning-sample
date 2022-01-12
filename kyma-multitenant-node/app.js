@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 //************************************************************************************************
 
+
 //**************************** Libraries for enabling authentication *****************************
 var passport = require('passport');
 var xsenv = require('@sap/xsenv');
@@ -14,7 +15,6 @@ var JWTStrategy = require('@sap/xssec').JWTStrategy;
 
 //************************* Auto-generated code by Express Framework *****************************
 var indexRouter = require('./routes/index');
-// const { indexRouter } = require('./routes/index');
 const { Console } = require('console');
 
 var app = express();
@@ -25,7 +25,6 @@ app.set('view engine', 'jade');
 
 //*********************************** Enabling authorization  ***********************************
 var services = xsenv.getServices({ uaa: { tag: 'xsuaa' } }); //Get the XSUAA service
-console.log(services);
 passport.use(new JWTStrategy(services.uaa));
 app.use(passport.initialize());
 app.use(passport.authenticate('JWT', { session: false })); //Authenticate using JWT strategy

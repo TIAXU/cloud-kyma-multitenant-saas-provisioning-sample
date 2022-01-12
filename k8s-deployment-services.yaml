@@ -11,7 +11,7 @@ spec:
   clusterServiceClassExternalName: xsuaa
   clusterServicePlanExternalName: application
   parameters:
-    xsappname: multitenant-kyma-demo
+    xsappname: multitenant-kyma-hands-on
     tenant-mode: shared
     description: Security profile of called application
     scopes:
@@ -35,24 +35,6 @@ spec:
     name: xsuaa-service
   secretName: xsuaa-service-binding
 
-################### Destination ###################
----
-apiVersion: servicecatalog.k8s.io/v1beta1
-kind: ServiceInstance
-metadata:
-  name: destination-service
-spec:
-  clusterServiceClassExternalName: destination
-  clusterServicePlanExternalName: lite
----
-apiVersion: servicecatalog.k8s.io/v1beta1
-kind: ServiceBinding
-metadata:
-  name: destination-service-binding
-spec:
-  instanceRef:
-    name: destination-service
-
 ################### SaaS Provisioning Service ###################
 ---
 apiVersion: servicecatalog.k8s.io/v1beta1
@@ -64,7 +46,7 @@ spec:
   clusterServicePlanExternalName: application
   parameters:
     # the xsappname refers to the one defined in xsuaa service
-    xsappname: multitenant-kyma-demo
+    xsappname: multitenant-kyma-hands-on
     displayName: Multitenancy Sample in Kyma
     description: A NodeJS application to show how to use the SaaS registry to build a multi-tenant application on BTP Kyma Runtime'
     category: 'Provider: TIA'
