@@ -21,7 +21,7 @@ spec:
     - HEAD
     path: /.*
   service:
-    host: kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com
+    host: trial-kyma-vnrmtio8-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com
     name: kyma-multitenant-node-multitenancy
     port: 8080
 status: {}
@@ -49,7 +49,7 @@ spec:
         app: kyma-multitenant-node-multitenancy
         release: multitenancy
     spec:
-      automountServiceAccountToken: false
+      automountServiceAccountToken: true
       imagePullSecrets:
         - name: registry-secret # replace with your own registry secret
       containers:
@@ -67,13 +67,13 @@ spec:
               "application_id": "0cec7be4-b09d-48f6-81ce-dad736ae4581",
               "application_version": "935bfe91-b6e2-43cc-99fd-89d0dd23c139",
               "application_uris": [
-                "kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
+                "trial-kyma-vnrmtio8-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
               ],
               "uris": [
-                "kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
+                "trial-kyma-vnrmtio8-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
               ]
             }
-        image: tiaxu/multitenant-node:v1
+        image: tiaxu/multitenancy-kyma-node-app:v1
         livenessProbe:
           exec:
             command:
@@ -121,7 +121,10 @@ spec:
           mountPath: "/etc/secrets/sapcp/destination/destination-service"
           readOnly: true
         - name: xsuaa-volume
-          mountPath: "/etc/secrets/sapcp/xsuaa/uaa-kyma-multitenant"
+          mountPath: "/etc/secrets/sapcp/xsuaa/xsuaa-service"
+          readOnly: true
+        - name: saas-registry-volume
+          mountPath: "/etc/secrets/sapcp/saas-registry/saas-registry-service"
           readOnly: true
         - mountPath: /tmp
           name: tmp
@@ -132,10 +135,14 @@ spec:
         name: tmp
       - name: xsuaa-volume
         secret:
-          secretName: uaa-kyma-multitenant-binding
+          secretName: xsuaa-service-binding
       - name: destination-volume
         secret:
           secretName: destination-service-binding
+      - name: saas-registry-volume
+        secret:
+          secretName: saas-registry-service-binding
+
 status: {}
 
 ---
@@ -180,3 +187,17 @@ spec:
       release: multitenancy
   policyTypes:
   - Ingress
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: broker-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: multitenancy-kyma-demo
+roleRef:
+  kind: ClusterRole
+  name: kyma-namespace-admin
+  apiGroup: rbac.authorization.k8s.io  

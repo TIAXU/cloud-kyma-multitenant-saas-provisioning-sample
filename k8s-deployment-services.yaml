@@ -1,4 +1,4 @@
-
+################### XSUAA ###################
 ---
 apiVersion: servicecatalog.k8s.io/v1beta1
 kind: ServiceInstance
@@ -6,13 +6,13 @@ metadata:
   annotations:
     com.sap.cki/source-instance-name: uaa_kyma_multitenant
   creationTimestamp: null
-  name: uaa-kyma-multitenant
+  name: xsuaa-service
 spec:
   clusterServiceClassExternalName: xsuaa
   clusterServicePlanExternalName: application
   parameters:
-    xsappname: multitenant-hands-on-kyma
-    tenant-mode: dedicated
+    xsappname: multitenant-kyma-demo
+    tenant-mode: shared
     description: Security profile of called application
     scopes:
     - name: $XSAPPNAME.Callback
@@ -28,13 +28,14 @@ apiVersion: servicecatalog.k8s.io/v1beta1
 kind: ServiceBinding
 metadata:
   creationTimestamp: null
-  name: uaa-kyma-multitenant-binding
+  name: xsuaa-service-binding
 spec:
   externalID: ""
   instanceRef:
-    name: uaa-kyma-multitenant
-  secretName: uaa-kyma-multitenant-binding
+    name: xsuaa-service
+  secretName: xsuaa-service-binding
 
+################### Destination ###################
 ---
 apiVersion: servicecatalog.k8s.io/v1beta1
 kind: ServiceInstance
@@ -52,8 +53,37 @@ spec:
   instanceRef:
     name: destination-service
 
-
-
+################### SaaS Provisioning Service ###################
+---
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: saas-registry-service
+spec:
+  clusterServiceClassExternalName: saas-registry
+  clusterServicePlanExternalName: application
+  parameters:
+    # the xsappname refers to the one defined in xsuaa service
+    xsappname: multitenant-kyma-demo
+    displayName: Multitenancy Sample in Kyma
+    description: A NodeJS application to show how to use the SaaS registry to build a multi-tenant application on BTP Kyma Runtime'
+    category: 'Provider: TIA'
+    appUrls:
+      # url registered in the kyma-broker which handles SaaS provisioning (subscription/deletion of saas instances)
+      onSubscription: https://trial-kyma-vnrmtio8-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com/callback/v1.0/tenants/{tenantId}
+      onSubscriptionAsync: false
+      onUnSubscriptionAsync: false
+---
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceBinding
+metadata:
+  creationTimestamp: null
+  name: saas-registry-service-binding
+spec:
+  externalID: ""
+  instanceRef:
+    name: saas-registry-service
+  secretName: saas-registry-service-binding
 
 
 

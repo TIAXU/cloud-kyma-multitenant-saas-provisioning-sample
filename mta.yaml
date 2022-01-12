@@ -10,14 +10,14 @@ modules:
    parameters:
       disk-quota: 256M
       memory: 256M
-      host: kyma-multitenant-node
+      host: trial-kyma-vnrmtio8-node
  - name: kyma-multitenant-approuter
    type: nodejs
    path: kyma-multitenant-approuter
    parameters:
       disk-quota: 256M
       memory: 256M
-      host: kyma-multitenant-approuter
+      host: trial-kyma-vnrmtio8-approuter
       keep-existing: 
         routes: true
    provides:

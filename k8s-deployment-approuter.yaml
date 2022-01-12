@@ -24,9 +24,9 @@ spec:
     # - handler: header
     #   config:
     #     headers:
-    #       x-forwarded-host: kyma-multitenant-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com # adapt to your Kyma cluster
-  service:
-    host: kyma-multitenant-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com
+    #       x-forwarded-host: trial-kyma-vnrmtio8-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com # adapt to your Kyma cluster
+  service:  
+    host: trial-kyma-vnrmtio8-approuter.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com
     name: kyma-multitenant-approuter-multitenancy
     port: 8080
 
@@ -69,8 +69,8 @@ spec:
             configMapKeyRef:
               key: cluster-domain
               name: cluster-domain
-        # - name: TENANT_HOST_PATTERN
-        #   value: ^(.*)-kyma-multitenant-approuter.$(CLUSTER_DOMAIN)"   
+        - name: TENANT_HOST_PATTERN
+          value: "^(.*)-approuter.$(CLUSTER_DOMAIN)"           
         - name: PORT
           value: "8080"
         - name: TMPDIR
@@ -135,7 +135,7 @@ spec:
           readOnlyRootFilesystem: false
         volumeMounts:
         - name: xsuaa-volume
-          mountPath: "/etc/secrets/sapcp/xsuaa/uaa-kyma-multitenant"
+          mountPath: "/etc/secrets/sapcp/xsuaa/xsuaa-service"
           readOnly: true
         - mountPath: /tmp
           name: tmp
@@ -146,7 +146,7 @@ spec:
         name: tmp
       - name: xsuaa-volume
         secret:
-          secretName: uaa-kyma-multitenant-binding
+          secretName: xsuaa-service-binding
 status: {}
 
 ---
@@ -185,7 +185,7 @@ data:
 #  make sure "namespace" of the broker is adapted when deploying to different namespace
   destinations: |
     [
-      {"name":"dest_kyma_multitenant_node","url":"https://kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com","forwardAuthToken" : true}
+      {"name":"dest_kyma_multitenant_node","url":"https://trial-kyma-vnrmtio8-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com","forwardAuthToken" : true}
     ] 
 ---
 apiVersion: v1

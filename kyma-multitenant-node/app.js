@@ -14,6 +14,7 @@ var JWTStrategy = require('@sap/xssec').JWTStrategy;
 
 //************************* Auto-generated code by Express Framework *****************************
 var indexRouter = require('./routes/index');
+// const { indexRouter } = require('./routes/index');
 const { Console } = require('console');
 
 var app = express();

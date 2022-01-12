@@ -1,4 +1,5 @@
 {
+    "welcomeFile": "/ui/index.html",
     "authenticationMethod": "route",
     "routes": [{
         "source": "/",
