@@ -6,6 +6,7 @@
         "start": "node ./bin/www"
     },
     "dependencies": {
+        "@kubernetes/client-node": "~0.15.0",
         "@sap/xsenv": "^3",
         "@sap/xssec": "^3",
         "cookie-parser": "~1.4.3",

@@ -3,7 +3,7 @@ var router = express.Router();
 
 const EF_SERVICE_NAME = 'kyma-multitenant-approuter-multitenancy';
 const EF_SERVICE_PORT = 8080;
-const EF_APIRULE_DEFAULT_NAMESPACE = 'multitenancy-kyma-demo';
+const EF_APIRULE_DEFAULT_NAMESPACE = 'multitenancy-ns';
 const KYMA_APIRULE_GROUP = 'gateway.kyma-project.io';
 const KYMA_APIRULE_VERSION = 'v1alpha1';
 const KYMA_APIRULE_PLURAL = 'apirules';
