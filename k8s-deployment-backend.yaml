@@ -73,7 +73,7 @@ spec:
                 "kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
               ]
             }
-        image: tiaxu/multitenancy-kyma-node-app:v1
+        image: tiaxu/multitenant-backend:v1
         livenessProbe:
           exec:
             command:
