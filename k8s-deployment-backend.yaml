@@ -58,21 +58,6 @@ spec:
           value: "8080"
         - name: TMPDIR
           value: /tmp
-        - name: VCAP_APPLICATION
-          value: |-
-            {
-              "process_id": 1,
-              "instance_id": 1,
-              "application_name": "kyma-multitenant-node",
-              "application_id": "0cec7be4-b09d-48f6-81ce-dad736ae4581",
-              "application_version": "935bfe91-b6e2-43cc-99fd-89d0dd23c139",
-              "application_uris": [
-                "kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
-              ],
-              "uris": [
-                "kyma-multitenant-node.e6803e4.kyma.shoot.live.k8s-hana.ondemand.com"
-              ]
-            }
         image: tiaxu/multitenant-backend:v1
         livenessProbe:
           exec:
